@@ -49,6 +49,7 @@
   .repo:hover { transform: translateY(-3px); border-color: #48515b; text-decoration: none; }
   .repo h3 { margin: 0; font-size: 17px; color: #e6edf3; }
   .repo .owner { font-size: 11px; color: var(--muted); font-weight: 400; }
+  .repo .live { font-size: 11px; color: #7ee787; font-weight: 600; }
   .repo p { margin: 0; color: #adbac7; font-size: 14px; line-height: 1.55; flex: 1; }
   .repo .meta { display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--muted); padding-top: 4px; }
   .repo .lang { display: inline-flex; align-items: center; gap: 6px; }
@@ -96,6 +97,7 @@
   const USER = "DebuggerPlus";
   const ORG = "AI-Agents-by-DebuggerPlus";
   const EXCLUDE = new Set(["pages-demo"]);
+  const SITE = { portfolio: "https://debuggerplus.github.io/portfolio/" };
   const LANGS = { "C#":"#178600","C++":"#f34b7d","C":"#555555","Python":"#3572A5","JavaScript":"#f1e05a",
     "TypeScript":"#3178c6","HTML":"#e34c26","CSS":"#563d7c","Java":"#b07219","MQL5":"#4a76b8",
     "MQL4":"#62A8D6","Shell":"#89e051","PowerShell":"#012456","Kotlin":"#A97BFF","Go":"#00ADD8" };
@@ -119,8 +121,10 @@
     const lang = r.language && LANGS[r.language]
       ? `<span class="lang"><i style="background:${LANGS[r.language]}"></i>${esc(r.language)}</span>` : "";
     const stars = r.stargazers_count > 0 ? `<span>★ ${r.stargazers_count}</span>` : "";
-    return `<a class="repo" href="${esc(r.html_url)}" target="_blank" rel="noopener noreferrer">
-      <h3>${esc(r.name)}${r.owner === ORG ? ' <span class="owner">AI-Agents-by-DebuggerPlus</span>' : ""}</h3>
+    const url = SITE[r.name] || r.html_url;
+    const live = SITE[r.name] ? ' <span class="live">Live ↗</span>' : "";
+    return `<a class="repo" href="${esc(url)}" target="_blank" rel="noopener noreferrer">
+      <h3>${esc(r.name)}${r.owner === ORG ? ' <span class="owner">AI-Agents-by-DebuggerPlus</span>' : ""}${live}</h3>
       <p>${esc(r.description || "No description provided.")}</p>
       <div class="meta">${lang}${stars}<span>${esc(ago(r.pushed_at || r.updated_at))}</span></div>
     </a>`;
