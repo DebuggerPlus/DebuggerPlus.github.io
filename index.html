@@ -27,13 +27,19 @@
   a { color: var(--accent); text-decoration: none; }
   a:hover { text-decoration: underline; }
   .wrap { max-width: 1040px; margin: 0 auto; }
-  header.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 26px 0; }
+  header.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 26px 0; }
   .logo { font-size: 20px; font-weight: 750; color: #e6edf3; }
   .logo span { color: var(--accent); }
   .logo:hover { text-decoration: none; }
+  .top-right { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
   nav.links { display: flex; gap: 22px; font-size: 14px; }
   nav.links a { color: var(--muted); }
   nav.links a:hover { color: #e6edf3; text-decoration: none; }
+  .lang { display: inline-flex; gap: 4px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 3px; }
+  .lang button { background: transparent; border: 0; color: var(--muted); font: inherit; font-size: 12px; font-weight: 600;
+                 letter-spacing: .5px; padding: 4px 9px; border-radius: 6px; cursor: pointer; }
+  .lang button:hover { color: #e6edf3; }
+  .lang button.active { background: #1f6feb33; color: #79c0ff; }
   .hero { padding: 40px 0 34px; }
   .tag { display: inline-block; font-size: 13px; color: #7ee787; background: #23863622;
          border: 1px solid #23863666; padding: 3px 12px; border-radius: 999px; margin-bottom: 18px; }
@@ -52,10 +58,9 @@
   .repo .live { font-size: 11px; color: #7ee787; font-weight: 600; }
   .repo p { margin: 0; color: #adbac7; font-size: 14px; line-height: 1.55; flex: 1; }
   .repo .meta { display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--muted); padding-top: 4px; }
-  .repo .lang { display: inline-flex; align-items: center; gap: 6px; }
-  .repo .lang i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .repo .lang-dot { display: inline-flex; align-items: center; gap: 6px; }
+  .repo .lang-dot i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
   .status { color: var(--muted); font-size: 14px; padding: 24px 0; }
-  .error { color: #f85149; font-size: 14px; padding: 12px 0; }
   footer { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 13px; color: var(--muted);
            display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
 </style>
@@ -64,30 +69,36 @@
 <div class="wrap">
   <header class="top">
     <a class="logo" href="/">Debugger<span>Plus</span></a>
-    <nav class="links">
-      <a href="/portfolio/">Portfolio</a>
-      <a href="https://github.com/DebuggerPlus?tab=repositories" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-    </nav>
+    <div class="top-right">
+      <nav class="links">
+        <a href="/portfolio/" data-i18n="navPortfolio">Portfolio</a>
+        <a href="https://github.com/DebuggerPlus?tab=repositories" target="_blank" rel="noopener noreferrer" data-i18n="navGithub">GitHub ↗</a>
+      </nav>
+      <div class="lang" role="group" aria-label="Language / Язык">
+        <button type="button" data-lang-btn="en">EN</button>
+        <button type="button" data-lang-btn="ru">RU</button>
+      </div>
+    </div>
   </header>
 
   <section class="hero">
     <span class="tag">GitHub · @DebuggerPlus</span>
-    <h1>Repositories &amp; Projects</h1>
-    <p>Desktop applications, AI-powered tools, automation systems and experimental software — the public side of what I build. Live from the GitHub API.</p>
+    <h1 data-i18n="h1">Repositories &amp; Projects</h1>
+    <p data-i18n="hero">Desktop applications, AI-powered tools, automation systems and experimental software — the public side of what I build. Live from the GitHub API.</p>
   </section>
 
   <div class="bar">
-    <h2>Public repositories</h2>
+    <h2 data-i18n="barHeading">Public repositories</h2>
     <span class="count" id="count"></span>
   </div>
 
   <div class="grid" id="grid">
-    <p class="status">Loading repositories…</p>
+    <p class="status" data-i18n="loading">Loading repositories…</p>
   </div>
 
   <footer>
-    <span>© <span id="year"></span> DebuggerPlus · Built with curiosity</span>
-    <span><a href="/portfolio/">Developer portfolio →</a></span>
+    <span data-i18n="footNote">© DebuggerPlus · Built with curiosity</span>
+    <span><a href="/portfolio/" data-i18n="footPortfolio">Developer portfolio →</a></span>
   </footer>
 </div>
 
@@ -98,39 +109,64 @@
   const ORG = "AI-Agents-by-DebuggerPlus";
   const EXCLUDE = new Set(["pages-demo"]);
   const SITE = { portfolio: "https://debuggerplus.github.io/portfolio/" };
-  const LANGS = { "C#":"#178600","C++":"#f34b7d","C":"#555555","Python":"#3572A5","JavaScript":"#f1e05a",
+  const COLOR = { "C#":"#178600","C++":"#f34b7d","C":"#555555","Python":"#3572A5","JavaScript":"#f1e05a",
     "TypeScript":"#3178c6","HTML":"#e34c26","CSS":"#563d7c","Java":"#b07219","MQL5":"#4a76b8",
     "MQL4":"#62A8D6","Shell":"#89e051","PowerShell":"#012456","Kotlin":"#A97BFF","Go":"#00ADD8" };
 
-  document.getElementById("year").textContent = new Date().getFullYear();
+  const DICT = {
+    en: { title:"DebuggerPlus — Repositories & Projects", navPortfolio:"Portfolio", navGithub:"GitHub ↗",
+      h1:"Repositories & Projects",
+      hero:"Desktop applications, AI-powered tools, automation systems and experimental software — the public side of what I build. Live from the GitHub API.",
+      barHeading:"Public repositories", noDesc:"No description provided.", empty:"No public repositories to show.",
+      loading:"Loading repositories…", liveBadge:"Live ↗",
+      footNote:"© DebuggerPlus · Built with curiosity", footPortfolio:"Developer portfolio →" },
+    ru: { title:"DebuggerPlus — Репозитории и проекты", navPortfolio:"Портфолио", navGithub:"GitHub ↗",
+      h1:"Репозитории и проекты",
+      hero:"Десктопные приложения, инструменты с ИИ, системы автоматизации и экспериментальное ПО — публичная сторона того, что я делаю. Данные подтягиваются с GitHub API.",
+      barHeading:"Публичные репозитории", noDesc:"Описание не указано.", empty:"Нет публичных репозиториев.",
+      loading:"Загрузка репозиториев…", liveBadge:"Сайт ↗",
+      footNote:"© DebuggerPlus · Сделано из любопытства", footPortfolio:"Портфолио разработчика →" }
+  };
 
+  const LANG_KEY = "dp-lang";
   const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c =>
     ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+  let lang = "en";
+  let DATA = null;
+
+  const plural = n => lang === "ru"
+    ? (n % 10 === 1 && n % 100 !== 11 ? n + " репозиторий"
+      : (n % 10 >= 2 && n % 10 <= 4 && !(n % 100 >= 12 && n % 100 <= 14)) ? n + " репозитория"
+      : n + " репозиториев")
+    : n + (n === 1 ? " repository" : " repositories");
 
   const ago = iso => {
     if (!iso) return "";
     const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
-    if (d <= 0) return "updated today";
-    if (d === 1) return "updated yesterday";
-    if (d < 30) return `updated ${d}d ago`;
-    if (d < 365) return `updated ${Math.round(d/30)}mo ago`;
-    return `updated ${Math.round(d/365)}y ago`;
+    const ru = lang === "ru";
+    if (d <= 0) return ru ? "обновлён сегодня" : "updated today";
+    if (d === 1) return ru ? "обновлён вчера" : "updated yesterday";
+    if (d < 30) return ru ? `обновлён ${d} дн. назад` : `updated ${d}d ago`;
+    if (d < 365) return ru ? `обновлён ${Math.round(d/30)} мес. назад` : `updated ${Math.round(d/30)}mo ago`;
+    return ru ? `обновлён ${Math.round(d/365)} г. назад` : `updated ${Math.round(d/365)}y ago`;
   };
 
   const card = r => {
-    const lang = r.language && LANGS[r.language]
-      ? `<span class="lang"><i style="background:${LANGS[r.language]}"></i>${esc(r.language)}</span>` : "";
+    const t = DICT[lang];
+    const lg = r.language && COLOR[r.language]
+      ? `<span class="lang-dot"><i style="background:${COLOR[r.language]}"></i>${esc(r.language)}</span>` : "";
     const stars = r.stargazers_count > 0 ? `<span>★ ${r.stargazers_count}</span>` : "";
     const url = SITE[r.name] || r.html_url;
-    const live = SITE[r.name] ? ' <span class="live">Live ↗</span>' : "";
+    const live = SITE[r.name] ? ` <span class="live">${esc(t.liveBadge)}</span>` : "";
     return `<a class="repo" href="${esc(url)}" target="_blank" rel="noopener noreferrer">
       <h3>${esc(r.name)}${r.owner === ORG ? ' <span class="owner">AI-Agents-by-DebuggerPlus</span>' : ""}${live}</h3>
-      <p>${esc(r.description || "No description provided.")}</p>
-      <div class="meta">${lang}${stars}<span>${esc(ago(r.pushed_at || r.updated_at))}</span></div>
+      <p>${esc(r.description || t.noDesc)}</p>
+      <div class="meta">${lg}${stars}<span>${esc(ago(r.pushed_at || r.updated_at))}</span></div>
     </a>`;
   };
 
-  const fallback = [
+  const FALLBACK = [
     { name:"EnglishTutorBot", html_url:"https://github.com/AI-Agents-by-DebuggerPlus/EnglishTutorBot",
       description:"AI-powered English learning assistant for vocabulary practice and conversational learning.", language:"C#" },
     { name:"ScreenRecorder", html_url:"https://github.com/DebuggerPlus/ScreenRecorder",
@@ -139,12 +175,45 @@
       description:"Autonomous AI agents, persistent memory, specialized roles and task routing.", language:"Python" }
   ];
 
-  const render = repos => {
+  function render() {
     const grid = document.getElementById("grid");
-    if (!repos.length) { grid.innerHTML = '<p class="status">No public repositories to show.</p>'; return; }
+    const t = DICT[lang];
+    const repos = DATA || [];
+    const count = document.getElementById("count");
+    if (!repos.length) { grid.innerHTML = `<p class="status">${esc(t.empty)}</p>`; count.textContent = ""; return; }
     grid.innerHTML = repos.map(card).join("");
-    document.getElementById("count").textContent = repos.length + (repos.length === 1 ? " repository" : " repositories");
-  };
+    count.textContent = plural(repos.length);
+  }
+
+  function applyLang(next) {
+    lang = next === "ru" ? "ru" : "en";
+    document.documentElement.lang = lang;
+    document.title = DICT[lang].title;
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+      const v = DICT[lang][el.getAttribute("data-i18n")];
+      if (v != null) el.textContent = v;
+    });
+    document.querySelectorAll("[data-lang-btn]").forEach(b => {
+      const on = b.dataset.langBtn === lang;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", String(on));
+    });
+    try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+    render();
+  }
+
+  document.querySelectorAll("[data-lang-btn]").forEach(b =>
+    b.addEventListener("click", () => applyLang(b.dataset.langBtn)));
+
+  const p = new URLSearchParams(location.search).get("lang");
+  let initial = p;
+  if (initial !== "ru" && initial !== "en") {
+    try { initial = localStorage.getItem(LANG_KEY); } catch (e) { initial = null; }
+  }
+  if (initial !== "ru" && initial !== "en") {
+    initial = (navigator.language || "en").toLowerCase().startsWith("ru") ? "ru" : "en";
+  }
+  applyLang(initial);
 
   fetch(`https://api.github.com/users/${USER}/repos?per_page=100&sort=updated`)
     .then(r => r.ok ? r.json() : Promise.reject(r.status))
@@ -154,8 +223,8 @@
     .then(list => list
       .filter(r => !r.fork && !r.archived && !EXCLUDE.has(r.name) && !r.name.endsWith(".github.io"))
       .sort((a, b) => new Date(b.pushed_at || 0) - new Date(a.pushed_at || 0)))
-    .then(render)
-    .catch(() => { render(fallback); });
+    .then(rs => { DATA = rs; render(); })
+    .catch(() => { DATA = FALLBACK; render(); });
 })();
 </script>
 </body>
